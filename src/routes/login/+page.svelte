@@ -39,14 +39,16 @@
 				</button>
 			</div>
 
-			<form class="space-y-4">
+			<form method="POST" class="space-y-4">
 				<input
 					type="email"
+					name="email"
 					placeholder="Email Address"
 					class="w-full rounded-lg bg-gray-200 p-2 outline-none focus:ring-2 focus:ring-blue-400"
 				/>
 				<input
 					type="password"
+					name="password"
 					placeholder="Password"
 					class="w-full rounded-lg bg-gray-200 p-2 outline-none focus:ring-2 focus:ring-blue-400"
 				/>
@@ -62,13 +64,14 @@
 				<Button
 					type="submit"
 					class="mt-6 w-full rounded-full bg-blue-500 py-4 text-lg font-bold text-white shadow-lg transition-transform hover:scale-[1.02] active:scale-95"
-					style="box-shadow: 0 4px 0px 0px #2563eb;"
-					onclick={() => {
-                        window.location.href = "/dashboard"
-					}}
 				>
 					Sign in
 				</Button>
+
+				<p class="text-center text-sm text-gray-500">
+					Don't have an account?
+					<a href="/register" class="font-semibold text-amber-500 hover:underline">Create one</a>
+				</p>
 			</form>
 		</div>
 	</div>

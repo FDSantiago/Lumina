@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { Switch, Label } from 'bits-ui';
-
+	import { enhance } from '$app/forms';
 	import * as Select from '$lib/components/ui/select/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
-
 	import IconBell from '~icons/lucide/bell';
 	import IconUser from '~icons/lucide/user';
 	import IconMessageSquare from '~icons/lucide/message-square';
@@ -12,87 +11,48 @@
 	import IconCalendar from '~icons/lucide/calendar';
 	import DatePicker from '$lib/components/ui/date-picker.svelte';
 
-	function getRandomInt(min: number, max: number) {
-		return Math.floor(Math.random() * (max - min + 1)) + min;
-	}
+	let { data } = $props();
 
+	const reportsCount = $derived(data.reports?.length ?? 0);
 	const stats = [
-		{ icon: IconMessageSquare, value: 2, label: 'New messages' },
-		{ icon: IconFileText, value: 4, label: 'Reports submitted' },
+		{ icon: IconMessageSquare, value: 0, label: 'New messages' },
+		{ icon: IconFileText, value: reportsCount, label: 'Reports submitted' },
 		{ icon: IconCalendar, value: 12, label: 'Days this month' }
 	];
 
-	let reports = $state([
-		{
-			id: 1,
-			title: 'Safety Concern',
-			meta: '#Lorem ipsum · 2 days ago',
-			badge: 'Under Review',
-			isReview: true
-		},
-		{
-			id: 2,
-			title: 'Policy Violation',
-			meta: '#Lorem ipsum · 1 day ago',
-			badge: 'Closed',
-			isReview: false
-		}
-	]);
-
+	let reports = $state(data.reports ?? []);
 	let description = $state('');
 	let witnessInfo = $state('');
 	let incidentTime = $state('');
 	let isAnonymous = $state(false);
 	let dialogOpen = $state(false);
 
-	function submitReport() {
-		const category = reportCategories.find((c) => c.value === report_value)?.label ?? report_value;
-		const severity =
-			severities.find((s) => s.value === severities_value)?.label ?? severities_value;
-		const newReport = {
-			id: getRandomInt(3, 10000),
-			title: category,
-			meta: `${category} · Just now`,
-			badge: severity,
-			isReview: false
-		};
-		reports = [newReport, ...reports];
-		description = '';
-		witnessInfo = '';
-		report_value = '';
-		severities_value = '';
-		incidentTime = '';
-		isAnonymous = false;
-		dialogOpen = false;
+	function formatDate(date: Date | null) {
+		if (!date) return 'Just now';
+		const d = new Date(date);
+		return (
+			d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) +
+			' · ' +
+			d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+		);
 	}
 
 	const reportCategories = [
-		// Existing
 		{ value: 'safety-concern', label: 'Safety Concern' },
 		{ value: 'policy-violation', label: 'Policy Violation' },
-
-		// Interpersonal & Behavioral
 		{ value: 'harassment-bullying', label: 'Harassment or Bullying' },
 		{ value: 'discrimination', label: 'Discrimination' },
 		{ value: 'workplace-violence', label: 'Workplace Violence' },
 		{ value: 'general-grievance', label: 'General Grievance' },
-
-		// Ethics & Compliance
 		{ value: 'theft-fraud', label: 'Theft or Fraud' },
 		{ value: 'conflict-of-interest', label: 'Conflict of Interest' },
 		{ value: 'data-privacy-breach', label: 'Data Privacy Breach' },
 		{ value: 'misuse-company-assets', label: 'Misuse of Company Assets' },
-
-		// Performance & Attendance
 		{ value: 'time-attendance', label: 'Time and Attendance Issue' },
 		{ value: 'performance-issue', label: 'Performance Issue' },
 		{ value: 'insubordination', label: 'Insubordination' },
-
-		// Health & Environment
 		{ value: 'substance-abuse', label: 'Substance Abuse' },
 		{ value: 'workplace-environment', label: 'Workplace Environment / Conditions' },
-
-		// Catch-all
 		{ value: 'other', label: 'Other' }
 	];
 	const severities = [
@@ -117,6 +77,44 @@
 			? severities.find((category) => category.value === severities_value)?.label
 			: 'Select a severity'
 	);
+
+	let submitting = $state(false);
+
+	async function submitReport() {
+		if (!report_value || !severities_value || !description) return;
+		submitting = true;
+
+		const formData = new FormData();
+		formData.append('category', report_value);
+		formData.append('severity', severities_value);
+		formData.append('description', description);
+		formData.append('isAnonymous', isAnonymous.toString());
+		formData.append('incidentTime', incidentTime);
+		formData.append('witnessInfo', witnessInfo);
+
+		try {
+			const res = await fetch('?/submitReport', {
+				method: 'POST',
+				body: formData
+			});
+
+			if (res.ok) {
+				const result = await res.json();
+				if (result.data?.report) {
+					reports = [result.data.report, ...reports];
+				}
+				dialogOpen = false;
+				description = '';
+				witnessInfo = '';
+				report_value = '';
+				severities_value = '';
+				incidentTime = '';
+				isAnonymous = false;
+			}
+		} finally {
+			submitting = false;
+		}
+	}
 </script>
 
 <!-- Shell -->
@@ -324,21 +322,24 @@
 						class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0 last:pb-0"
 					>
 						<div>
-							<span class="block text-[13px] font-semibold text-gray-900">{r.title}</span>
-							<span class="text-[11px] text-gray-400">{r.meta}</span>
-						</div>
-						{#if r.badge}
-							<span
-								class="rounded-full px-2.5 py-1 text-[11px] font-semibold
-                           {r.isReview ? 'bg-amber-100 text-amber-600' : 'bg-red-100 text-red-500'}"
+							<span class="block text-[13px] font-semibold text-gray-900">{r.category}</span>
+							<span class="text-[11px] text-gray-400"
+								>#{r.reportNumber} · {formatDate(r.createdAt)}</span
 							>
-								{r.badge}
-							</span>
-						{:else}
-							<span class="inline-block h-5 w-[60px] rounded-full bg-red-100"></span>
-						{/if}
+						</div>
+						<span
+							class="rounded-full px-2.5 py-1 text-[11px] font-semibold capitalize
+                            {r.status === 'under_review' || r.status === 'new'
+								? 'bg-amber-100 text-amber-600'
+								: 'bg-gray-100 text-gray-600'}"
+						>
+							{r.severity}
+						</span>
 					</div>
 				{/each}
+				{#if reports.length === 0}
+					<p class="py-4 text-center text-[13px] text-gray-400">No reports submitted yet.</p>
+				{/if}
 			</div>
 		</div>
 	</main>

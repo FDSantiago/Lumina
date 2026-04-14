@@ -1,15 +1,23 @@
 <script lang="ts">
 	import { APP_NAME } from '$lib/config';
-
-	import { resolve } from "$app/paths";
-
+	import { resolve } from '$app/paths';
 	import IconLogOut from '~icons/lucide/log-out';
 	import IconUser from '~icons/lucide/user';
 	import { goto } from '$app/navigation';
-	
-	let activePage = $state('dashboard');
+	import { page } from '$app/stores';
 
-	let { children } = $props();
+	let activePage = $state('dashboard');
+	let { children, data } = $props();
+
+	const userName = $derived((data as any)?.user?.name ?? 'User');
+	const userDepartment = $derived((data as any)?.profile?.department ?? 'Employee');
+	const userRole = $derived((data as any)?.profile?.role ?? 'employee');
+
+	$effect(() => {
+		const path = $page.url.pathname;
+		if (path.includes('dashboard')) activePage = 'dashboard';
+		else if (path.includes('profile')) activePage = 'profile';
+	});
 </script>
 
 <aside
@@ -25,8 +33,8 @@
 		<nav class="flex flex-col gap-1.5">
 			<button
 				onclick={() => {
-					activePage = "dashboard"
-					goto(resolve('/dashboard'))
+					activePage = 'dashboard';
+					goto(resolve('/dashboard'));
 				}}
 				class="rounded-[10px] px-3.5 py-2 text-left text-[13px] font-semibold tracking-wide text-[#1a3a5c] uppercase transition-colors
                  {activePage === 'dashboard' ? 'bg-white/50' : 'hover:bg-white/35'}"
@@ -35,8 +43,8 @@
 			</button>
 			<button
 				onclick={() => {
-					activePage = "profile"
-					goto(resolve('/profile'))
+					activePage = 'profile';
+					goto(resolve('/profile'));
 				}}
 				class="rounded-[10px] px-3.5 py-2 text-left text-[13px] font-semibold tracking-wide text-[#1a3a5c] uppercase transition-colors
                  {activePage === 'profile' ? 'bg-white/50' : 'hover:bg-white/35'}"
@@ -55,8 +63,8 @@
 				<IconUser />
 			</div>
 			<div class="flex flex-col">
-				<span class="text-[13px] leading-tight font-bold text-white">Employee</span>
-				<span class="text-[11px] text-white/70">Engineering</span>
+				<span class="text-[13px] leading-tight font-bold text-white">{userName}</span>
+				<span class="text-[11px] text-white/70 capitalize">{userDepartment}</span>
 			</div>
 		</div>
 
@@ -64,11 +72,11 @@
 			class="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 text-[13px] font-semibold text-red-600 transition-colors hover:bg-red-500/10"
 		>
 			<IconLogOut />
-			<a href={resolve("/login")}>Log out</a>
+			<a href={resolve('/login')}>Log out</a>
 		</button>
 	</div>
 </aside>
 
-<div class="pl-48 rounded-lg">
+<div class="rounded-lg pl-48">
 	{@render children()}
 </div>
