@@ -1,4 +1,4 @@
-<script lang="ts">
+	<script lang="ts">
 	import { APP_NAME } from '$lib/config';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import LucideShield from '~icons/lucide/shield';

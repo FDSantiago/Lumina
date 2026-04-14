@@ -19,6 +19,7 @@ export async function createReport(data: {
 	incidentTime: string | null;
 	witnessInfo: string | null;
 }) {
+	console.log(data)
 	const reportNumber = await generateReportNumber();
 	const [newReport] = await db
 		.insert(report)

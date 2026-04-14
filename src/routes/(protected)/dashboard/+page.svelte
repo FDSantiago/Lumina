@@ -11,7 +11,7 @@
 	import IconCalendar from '~icons/lucide/calendar';
 	import DatePicker from '$lib/components/ui/date-picker.svelte';
 
-	let { data } = $props();
+	let { data, form } = $props();
 
 	const reportsCount = $derived(data.reports?.length ?? 0);
 	const stats = [
@@ -111,6 +111,8 @@
 				incidentTime = '';
 				isAnonymous = false;
 			}
+		} catch (e) {
+			console.error('Failed to submit report:', e);
 		} finally {
 			submitting = false;
 		}
@@ -203,7 +205,7 @@
 							<div class="flex w-full flex-col gap-4">
 								<div class="mt-4 flex flex-col gap-1.5">
 									<Label.Root class="text-sm font-medium text-gray-700">Report Type</Label.Root>
-									<Select.Root type="single" name="favoriteFruit" bind:value={report_value}>
+									<Select.Root type="single" name="category" bind:value={report_value}>
 										<Select.Trigger class="w-full">
 											{report_selectedLabel}
 										</Select.Trigger>
@@ -221,7 +223,7 @@
 
 								<div class="flex flex-col gap-1.5">
 									<Label.Root class="text-sm font-medium text-gray-700">Severity</Label.Root>
-									<Select.Root type="single" name="favoriteFruit" bind:value={severities_value}>
+									<Select.Root type="single" name="severity" bind:value={severities_value}>
 										<Select.Trigger class="w-full">
 											{severities_selectedLabel}
 										</Select.Trigger>
