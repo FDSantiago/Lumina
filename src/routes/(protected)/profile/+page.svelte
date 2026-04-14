@@ -1,4 +1,6 @@
 <script>
+    import LucidePencil from '~icons/lucide/pencil';
+
   let currentPassword = '';
   let newPassword = '';
   let confirmPassword = '';
@@ -11,10 +13,10 @@
   };
 
   const activityLog = [
-    { action: null, ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
-    { action: 'Submitted report #REP-847', ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
-    { action: null, ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
-    { action: 'Changed password', ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
+    { id: 1, action: null, ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
+    { id: 2, action: 'Submitted report #REP-847', ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
+    { id: 3, action: null, ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
+    { id: 4, action: 'Changed password', ip: 'IP: 192.168.1.***', date: 'Nov 28, 2025, 11:08 PM' },
   ];
 
   function toggleNotification(key) {
@@ -39,7 +41,7 @@
       <div class="avatar-wrap">
         <div class="avatar">e</div>
         <div class="avatar-badge">
-          <Icon icon="mdi:pencil" width="10" />
+          <LucidePencil />
         </div>
       </div>
       <div class="profile-info">
@@ -165,7 +167,7 @@
     </div>
 
     <div class="activity-list">
-      {#each activityLog as entry (entry.ip)}
+      {#each activityLog as entry (entry.id)}
         <div class="activity-item">
           <div class="activity-left">
             {#if entry.action}

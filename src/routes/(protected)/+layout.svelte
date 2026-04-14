@@ -5,6 +5,7 @@
 
 	import IconLogOut from '~icons/lucide/log-out';
 	import IconUser from '~icons/lucide/user';
+	import { goto } from '$app/navigation';
 	
 	let activePage = $state('dashboard');
 
@@ -12,7 +13,7 @@
 </script>
 
 <aside
-	class="absolute inset-y-0 left-0 flex w-[180px] shrink-0 flex-col justify-between rounded-r-[28px] bg-[#8FD4FF] px-4 py-7"
+	class="fixed inset-y-0 left-0 flex w-[180px] shrink-0 flex-col justify-between rounded-r-[28px] bg-[#8FD4FF] px-4 py-7"
 >
 	<!-- Top: logo + nav -->
 	<div class="flex flex-col gap-10">
@@ -22,20 +23,26 @@
 		</div>
 
 		<nav class="flex flex-col gap-1.5">
-			<a
-				href={resolve('/dashboard')}
+			<button
+				onclick={() => {
+					activePage = "dashboard"
+					goto(resolve('/dashboard'))
+				}}
 				class="rounded-[10px] px-3.5 py-2 text-left text-[13px] font-semibold tracking-wide text-[#1a3a5c] uppercase transition-colors
                  {activePage === 'dashboard' ? 'bg-white/50' : 'hover:bg-white/35'}"
 			>
 				Dashboard
-			</a>
-			<a
-				href={resolve('/profile')}
+			</button>
+			<button
+				onclick={() => {
+					activePage = "profile"
+					goto(resolve('/profile'))
+				}}
 				class="rounded-[10px] px-3.5 py-2 text-left text-[13px] font-semibold tracking-wide text-[#1a3a5c] uppercase transition-colors
                  {activePage === 'profile' ? 'bg-white/50' : 'hover:bg-white/35'}"
 			>
 				Profile
-			</a>
+			</button>
 		</nav>
 	</div>
 
