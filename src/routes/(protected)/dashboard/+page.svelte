@@ -12,6 +12,10 @@
 	import IconCalendar from '~icons/lucide/calendar';
 	import DatePicker from '$lib/components/ui/date-picker.svelte';
 
+	function getRandomInt(min: number, max: number) {
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
 	const stats = [
 		{ icon: IconMessageSquare, value: 2, label: 'New messages' },
 		{ icon: IconFileText, value: 4, label: 'Reports submitted' },
@@ -20,12 +24,19 @@
 
 	let reports = $state([
 		{
+			id: 1,
 			title: 'Safety Concern',
 			meta: '#Lorem ipsum · 2 days ago',
 			badge: 'Under Review',
 			isReview: true
 		},
-		{ title: 'Policy Violation', meta: '#Lorem ipsum · 1 day ago', badge: '', isReview: false }
+		{
+			id: 2,
+			title: 'Policy Violation',
+			meta: '#Lorem ipsum · 1 day ago',
+			badge: 'Closed',
+			isReview: false
+		}
 	]);
 
 	let description = $state('');
@@ -39,8 +50,9 @@
 		const severity =
 			severities.find((s) => s.value === severities_value)?.label ?? severities_value;
 		const newReport = {
+			id: getRandomInt(3, 10000),
 			title: category,
-			meta: `#${category} · Just now`,
+			meta: `${category} · Just now`,
 			badge: severity,
 			isReview: false
 		};
@@ -55,8 +67,33 @@
 	}
 
 	const reportCategories = [
+		// Existing
 		{ value: 'safety-concern', label: 'Safety Concern' },
-		{ value: 'policy-violation', label: 'Policy Violation' }
+		{ value: 'policy-violation', label: 'Policy Violation' },
+
+		// Interpersonal & Behavioral
+		{ value: 'harassment-bullying', label: 'Harassment or Bullying' },
+		{ value: 'discrimination', label: 'Discrimination' },
+		{ value: 'workplace-violence', label: 'Workplace Violence' },
+		{ value: 'general-grievance', label: 'General Grievance' },
+
+		// Ethics & Compliance
+		{ value: 'theft-fraud', label: 'Theft or Fraud' },
+		{ value: 'conflict-of-interest', label: 'Conflict of Interest' },
+		{ value: 'data-privacy-breach', label: 'Data Privacy Breach' },
+		{ value: 'misuse-company-assets', label: 'Misuse of Company Assets' },
+
+		// Performance & Attendance
+		{ value: 'time-attendance', label: 'Time and Attendance Issue' },
+		{ value: 'performance-issue', label: 'Performance Issue' },
+		{ value: 'insubordination', label: 'Insubordination' },
+
+		// Health & Environment
+		{ value: 'substance-abuse', label: 'Substance Abuse' },
+		{ value: 'workplace-environment', label: 'Workplace Environment / Conditions' },
+
+		// Catch-all
+		{ value: 'other', label: 'Other' }
 	];
 	const severities = [
 		{ value: 'critical', label: 'Critical' },
@@ -282,7 +319,7 @@
 			</div>
 
 			<div class="flex flex-col gap-3">
-				{#each reports as r (r.title)}
+				{#each reports as r (r.id)}
 					<div
 						class="flex items-center justify-between border-b border-gray-100 pb-3 last:border-0 last:pb-0"
 					>

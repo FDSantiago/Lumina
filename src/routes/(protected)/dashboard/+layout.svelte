@@ -57,7 +57,7 @@
 			class="flex cursor-pointer items-center gap-2 rounded-lg px-1.5 py-1 text-[13px] font-semibold text-red-600 transition-colors hover:bg-red-500/10"
 		>
 			<IconLogOut />
-			<span>Log out</span>
+			<a href={resolve("/login")}>Log out</a>
 		</button>
 	</div>
 </aside>
